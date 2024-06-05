@@ -3,16 +3,25 @@ locals {
 
   private_subnet_tags = merge(
     module.tag.default_tags,
-    { Name = join("-", [var.tags.workload, "private-subnet"]) }
+    {
+      Name        = join("-", [module.tag.default_tags["Prefix"], "private-subnet-main"]),
+      Description = "The private subnet of vpc main"
+    }
   )
 
   public_subnet_tags = merge(
     module.tag.default_tags,
-    { Name = join("-", [var.tags.workload, "public-subnet"]) }
+    {
+      Name        = join("-", [module.tag.default_tags["Prefix"], "public-subnet-main"])
+      Description = "The public subnet of vpc main"
+    }
   )
 
-  vpc_tags = merge(
+  nat_instance_tags = merge(
     module.tag.default_tags,
-    { Name = join("-", [var.tags.workload, "vpc"]) }
+    {
+      Name        = join("-", [module.tag.default_tags["Prefix"], "nat-instance"])
+      Description = "The NAT instance of vpc main"
+    }
   )
 }
