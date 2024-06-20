@@ -35,3 +35,4 @@ terraform.rc
 
 # Ignore .env folder
 **/.env/*
+**/test/*
