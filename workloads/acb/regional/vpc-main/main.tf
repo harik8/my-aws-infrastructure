@@ -41,15 +41,6 @@ resource "aws_instance" "nat" {
 
   iam_instance_profile = aws_iam_instance_profile.nat.name
 
-  # user_data = <<-EOF
-  #             #!/bin/bash
-  #             yum update -y
-  #             yum install -y iptables-services
-  #             sysctl -w net.ipv4.ip_forward=1
-  #             iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-  #             service iptables save
-  #             EOF
-
   tags = local.nat_instance_tags
 }
 
@@ -107,22 +98,10 @@ resource "aws_security_group_rule" "nat_egress" {
   protocol          = "-1"
 }
 
-# resource "aws_network_interface" "nat" {
-#   subnet_id         = module.vpc.public_subnets[0]
-#   security_groups   = [aws_security_group.nat.id]
-#   source_dest_check = false
-
-#   attachment {
-#     instance     = aws_instance.nat.id
-#     device_index = 1
-#   }
-# }
-
 resource "aws_route" "nat" {
   count = length(module.vpc.private_route_table_ids)
 
   route_table_id         = module.vpc.private_route_table_ids[count.index]
   destination_cidr_block = "0.0.0.0/0"
-  # network_interface_id   = aws_network_interface.nat.id
   network_interface_id = aws_instance.nat.primary_network_interface_id
 }
