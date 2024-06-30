@@ -25,9 +25,9 @@ module "eks" {
     vpc-cni = {
       most_recent = true
     }
-    aws-ebs-csi-driver = {
-      most_recent = true
-    }
+    # aws-ebs-csi-driver = {
+    #   most_recent = true
+    # }
   }
 
   vpc_id                   = data.terraform_remote_state.vpc.outputs.vpc["vpc_id"]
@@ -35,4 +35,20 @@ module "eks" {
   control_plane_subnet_ids = data.terraform_remote_state.vpc.outputs.vpc["private_subnets"]
 
   enable_cluster_creator_admin_permissions = true
+
+  access_entries = {
+    github = {
+      kubernetes_groups = []
+      user_name         = "GithubActions"
+      principal_arn     = data.terraform_remote_state.iam.outputs.eks_cd_role_arn
+      policy_associations = {
+        github = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
+  }
 }

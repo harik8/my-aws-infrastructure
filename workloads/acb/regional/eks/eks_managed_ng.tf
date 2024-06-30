@@ -28,5 +28,5 @@ module "eks_managed_node_group" {
     }
   }
 
-  tags = local.eks_managed_node_groups_tags
+  tags = module.tag.default_tags
 }

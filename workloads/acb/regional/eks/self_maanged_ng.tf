@@ -24,5 +24,5 @@ module "self_managed_node_group" {
 
   target_group_arns = module.nlb_public.target_group_arns
 
-  tags = local.self_managed_node_groups_tags
+  tags = module.tag.default_tags
 }

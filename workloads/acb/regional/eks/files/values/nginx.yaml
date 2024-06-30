@@ -1,4 +1,5 @@
 ---
+fullnameOverride: nginx-public
 controller:
   replicaCount: 1
   service:
@@ -8,5 +9,7 @@ controller:
     ports:
       http: 80
       https: 443
+  ingressClassResource:
+    name: public
 defaultBackend:
   enabled: false
