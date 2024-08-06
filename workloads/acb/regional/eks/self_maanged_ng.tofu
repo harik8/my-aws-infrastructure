@@ -1,5 +1,5 @@
 module "self_managed_node_group" {
-  source = "github.com/terraform-aws-modules/terraform-aws-eks//modules/self-managed-node-group?ref=v20.13.1"
+  source = "github.com/terraform-aws-modules/terraform-aws-eks//modules/self-managed-node-group?ref=${local.self_managed_node_group}"
 
   name                 = module.tag.default_tags["Name"]
   cluster_name         = module.eks.cluster_name
@@ -16,13 +16,26 @@ module "self_managed_node_group" {
   ]
 
   min_size     = 1
-  max_size     = 1
-  desired_size = 1
+  max_size     = 2
+  desired_size = 2
 
   ami_type      = "AL2_ARM_64"
-  instance_type = "t4g.small"
+  instance_type = "t4g.large"
+
+  block_device_mappings = {
+    xvda = {
+      device_name = "/dev/xvda"
+      ebs = {
+        volume_type = "gp3"
+      }
+    }
+  }
 
   target_group_arns = module.nlb_public.target_group_arns
+
+  iam_role_additional_policies = {
+    AmazonEBSCSIDriverPolicy = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+  }
 
   tags = module.tag.default_tags
 }
