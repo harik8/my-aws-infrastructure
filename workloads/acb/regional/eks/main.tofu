@@ -8,7 +8,7 @@ module "tag" {
 }
 
 module "eks" {
-  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v20.13.1"
+  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=${local.eks}"
 
   cluster_name    = module.tag.default_tags["Name"]
   cluster_version = var.cluster_version
@@ -25,9 +25,9 @@ module "eks" {
     vpc-cni = {
       most_recent = true
     }
-    # aws-ebs-csi-driver = {
-    #   most_recent = true
-    # }
+    aws-ebs-csi-driver = {
+      most_recent = false
+    }
   }
 
   vpc_id                   = data.terraform_remote_state.vpc.outputs.vpc["vpc_id"]
@@ -50,5 +50,23 @@ module "eks" {
         }
       }
     }
+  }
+}
+
+resource "kubernetes_storage_class_v1" "this" {
+  metadata {
+    name = "gp3"
+    annotations = {
+      "storageclass.kubernetes.io/is-default-class" = "true"
+    }
+  }
+
+  storage_provisioner    = "ebs.csi.aws.com"
+  volume_binding_mode    = "WaitForFirstConsumer"
+  allow_volume_expansion = false
+
+  parameters = {
+    type      = "gp3"
+    encrypted = "true"
   }
 }

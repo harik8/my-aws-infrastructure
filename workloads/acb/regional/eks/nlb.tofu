@@ -1,5 +1,5 @@
 module "nlb_public" {
-  source = "github.com/terraform-aws-modules/terraform-aws-alb?ref=v8.7.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-alb?ref=${local.nlb}"
 
   name = local.nlb_public_tags["Name"]
 

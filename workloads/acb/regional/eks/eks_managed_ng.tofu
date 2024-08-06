@@ -1,5 +1,5 @@
 module "eks_managed_node_group" {
-  source = "github.com/terraform-aws-modules/terraform-aws-eks//modules/eks-managed-node-group?ref=v20.13.1"
+  source = "github.com/terraform-aws-modules/terraform-aws-eks//modules/eks-managed-node-group?ref=${local.eks_managed_node_group}"
 
   name                 = module.tag.default_tags["Name"]
   cluster_name         = module.eks.cluster_name
@@ -20,12 +20,27 @@ module "eks_managed_node_group" {
   instance_types = ["t4g.small"]
   capacity_type  = "SPOT"
 
+
+  block_device_mappings = {
+    xvda = {
+      device_name = "/dev/xvda"
+      ebs = {
+        volume_type = "gp3"
+        encrypted   = true
+      }
+    }
+  }
+
   taints = {
     dedicated = {
       key    = "application"
       value  = "true"
       effect = "NO_SCHEDULE"
     }
+  }
+
+  iam_role_additional_policies = {
+    AmazonEBSCSIDriverPolicy = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
   }
 
   tags = module.tag.default_tags
