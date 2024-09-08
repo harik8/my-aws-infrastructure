@@ -16,8 +16,8 @@ module "self_managed_node_group" {
   ]
 
   min_size     = 1
-  max_size     = 2
-  desired_size = 2
+  max_size     = 1
+  desired_size = 1
 
   ami_type      = "AL2_ARM_64"
   instance_type = "t4g.large"

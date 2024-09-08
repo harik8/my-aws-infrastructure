@@ -1,7 +1,5 @@
 module "nlb_public" {
-  source = "github.com/terraform-aws-modules/terraform-aws-alb?ref=${local.nlb}"
-
-  create_lb = false
+  source = "github.com/terraform-aws-modules/terraform-aws-alb?ref=v8.7.0"
 
   name = local.nlb_public_tags["Name"]
 
@@ -18,12 +16,12 @@ module "nlb_public" {
       name                 = join("-", [module.tag.default_tags["Prefix"], "nlb-public"])
       backend_protocol     = "TCP"
       backend_port         = 80
-      target_type          = "instance"
+      target_type          = "ip"
       deregistration_delay = 10
       health_check = {
         enabled             = true
         interval            = 30
-        path                = "/healthz"
+        path                = "/"
         port                = "traffic-port"
         healthy_threshold   = 2
         unhealthy_threshold = 2

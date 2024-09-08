@@ -14,19 +14,25 @@ module "eks" {
   cluster_version = var.cluster_version
 
   cluster_endpoint_public_access = true
+  cluster_encryption_config      = {}
+  create_kms_key                 = false
 
   cluster_addons = {
     coredns = {
       most_recent = true
+      configuration_values = jsonencode({
+        autoScaling = {
+          enabled     = true
+          minReplicas = 2
+          maxReplicas = 2
+        }
+      })
     }
     kube-proxy = {
       most_recent = true
     }
     vpc-cni = {
       most_recent = true
-    }
-    aws-ebs-csi-driver = {
-      most_recent = false
     }
   }
 
@@ -51,9 +57,17 @@ module "eks" {
       }
     }
   }
+
+  node_security_group_tags = merge(module.tag.default_tags,
+    {
+      Name                     = join("-", [module.tag.default_tags["Name"], "node"]),
+      "karpenter.sh/discovery" = "acb-eun1-sandbox-eks"
+  })
 }
 
 resource "kubernetes_storage_class_v1" "this" {
+  depends_on = [module.eks]
+
   metadata {
     name = "gp3"
     annotations = {
