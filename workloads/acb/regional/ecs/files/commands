@@ -1,3 +1,0 @@
-aws ecs register-task-definition --cli-input-json file://files/nginx-task.json
-aws ecs create-service --cli-input-json file://python-svc.json
-dckr_pat_KrreckoPfyWI7Er9F5yvF7WiLFU
