@@ -5,7 +5,7 @@ controller:
   service:
     type: ClusterIP
   hostPort:
-    enabled: true
+    enabled: false
     ports:
       http: 80
       https: 443

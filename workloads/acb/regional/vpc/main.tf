@@ -12,15 +12,24 @@ module "vpc" {
 
   cidr = var.vpc_cidr
 
-  azs             = local.azs
-  private_subnets = [for k, v in local.azs : cidrsubnet(var.vpc_cidr, 4, k)]
-  public_subnets  = [for k, v in local.azs : cidrsubnet(var.vpc_cidr, 4, k + 4)]
-
+  azs                = local.azs
   enable_nat_gateway = false
-  single_nat_gateway  = false
+  single_nat_gateway = false
+
+  private_subnets = [for k in range(0, length(local.azs)) : cidrsubnet(var.vpc_cidr, 8, k + 8)]
+  public_subnets  = [for k in range(0, length(local.azs)) : cidrsubnet(var.vpc_cidr, 12, k + 8)]
+  intra_subnets   = [for k in range(0, length(local.azs)) : cidrsubnet(var.vpc_cidr, 8, k + 12)]
+
+  enable_ipv6                                   = true
+  public_subnet_assign_ipv6_address_on_creation = true
+
+  public_subnet_ipv6_prefixes  = [0, 1, 2]
+  private_subnet_ipv6_prefixes = [3, 4, 5]
+  intra_subnet_ipv6_prefixes   = [6, 7, 8]
 
   private_subnet_tags      = local.private_subnet_tags
   public_subnet_tags       = local.public_subnet_tags
+  intra_subnet_tags        = local.intra_subnet_tags
   private_route_table_tags = local.private_subnet_tags
   public_route_table_tags  = local.public_subnet_tags
 
@@ -33,11 +42,12 @@ module "vpc" {
 
 resource "aws_instance" "nat" {
   ami                         = data.aws_ami.main.id
-  instance_type               = "t3.micro"
+  instance_type               = "t3.nano"
   subnet_id                   = module.vpc.public_subnets[0]
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   vpc_security_group_ids      = [aws_security_group.nat.id]
   source_dest_check           = false
+  ipv6_address_count          = 0
 
   iam_instance_profile = aws_iam_instance_profile.nat.name
 
@@ -103,5 +113,5 @@ resource "aws_route" "nat" {
 
   route_table_id         = module.vpc.private_route_table_ids[count.index]
   destination_cidr_block = "0.0.0.0/0"
-  network_interface_id = aws_instance.nat.primary_network_interface_id
+  network_interface_id   = aws_instance.nat.primary_network_interface_id
 }

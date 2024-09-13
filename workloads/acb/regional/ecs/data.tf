@@ -1,5 +1,3 @@
-data "aws_partition" "current" {}
-
 data "terraform_remote_state" "vpc" {
   backend   = "s3"
   workspace = terraform.workspace
@@ -16,16 +14,6 @@ data "terraform_remote_state" "acm" {
   config = {
     bucket = var.tf_state_s3_bucket
     key    = "acm/terraform.tfstate"
-    region = var.aws_region
-  }
-}
-
-data "terraform_remote_state" "iam" {
-  backend   = "s3"
-  workspace = terraform.workspace
-  config = {
-    bucket = var.tf_state_s3_bucket
-    key    = "iam/terraform.tfstate"
     region = var.aws_region
   }
 }
