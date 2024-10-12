@@ -4,24 +4,20 @@ variable "tags" {
   default = {
     description = ""
     environment = ""
-    name        = ""
+    owner       = ""
+    utilization = ""
     workload    = ""
-    team        = ""
   }
 }
 
 variable "aws_region" {
+  default     = ""
   description = "The AWS region"
   type        = string
 }
 
 variable "account_id" {
+  default     = ""
   description = "The AWS Account id"
   type        = string
 }
-
-variable "vpc_cidr" {
-  description = "The VPC CIDR block"
-  type        = string
-}
-
